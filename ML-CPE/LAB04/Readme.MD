@@ -4,7 +4,9 @@
 
 1. **Classification** ด้วยเทคนิค K-Nearest Neighbors (KNN) เพื่อจำแนกเพศ (Sex)
 2. **Clustering** ด้วยเทคนิค K-Means ร่วมกับ TensorFlow เพื่อจัดกลุ่มข้อมูลสรีระและการเผาผลาญ
-   Dataset ที่ใช้มาจาก Kaggle: https://www.kaggle.com/competitions/f-1-racer-diet-planning
+
+Dataset ที่ใช้มาจาก Kaggle: https://www.kaggle.com/competitions/f-1-racer-diet-planning
+
 
 ---
 
@@ -67,9 +69,9 @@
 
 ### วิธีรัน
 
-````bash
+```bash
 python classification/main.py
-
+```
 ---
 
 ## 4. ส่วนที่ 2: Clustering ด้วย K-Means
@@ -94,7 +96,7 @@ python classification/main.py
 ### วิธีรัน
 ```bash
 python clustering/main.py
-
+```
 ## 5. คำอธิบายสั้น ๆ ของเทคนิคที่ใช้
 - KNN (K-Nearest Neighbors):
 อัลกอริทึมจำแนกประเภทข้อมูลโดยคำนวณระยะทาง Euclidean จากจุดข้อมูลใหม่ไปยังจุดข้อมูลฝึกสอนทั้งหมด แล้วทำการโหวตเสียงข้างมาก (Majority Voting) จากเพื่อนบ้านที่ใกล้ที่สุด k ตัว
@@ -104,4 +106,3 @@ python clustering/main.py
 
 ## 6. สรุป
 โปรเจกต์นี้แสดงให้เห็นถึงการประยุกต์ใช้ Machine Learning สองรูปแบบกับชุดข้อมูล Calories Burned Dataset โดย Classification ช่วยให้เราเข้าใจการใช้ KNN ทายเพศจากลักษณะสรีระ และ Clustering ช่วยจัดกลุ่มผู้ใช้ออกกำลังกายที่มีลักษณะสรีระใกล้เคียงกันโดยไม่ต้องพึ่งพา Label เฉลย ทำให้เข้าใจกระบวนการทำงานพื้นฐานของทั้ง Supervised และ Unsupervised Learning ได้อย่างชัดเจน
-````
