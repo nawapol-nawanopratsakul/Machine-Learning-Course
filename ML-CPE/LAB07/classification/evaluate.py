@@ -1,19 +1,36 @@
 import os
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score
+
+def plot_training_history(history, model_name):
+    os.makedirs("outputs", exist_ok=True)
+    plt.figure(figsize=(10, 4))
+    
+    # กราฟ Accuracy
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Train Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Val Accuracy')
+    plt.title(f'Accuracy: {model_name}')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    
+    # กราฟ Loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Train Loss')
+    plt.plot(history.history['val_loss'], label='Val Loss')
+    plt.title(f'Loss: {model_name}')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    
+    plt.tight_layout()
+    plt.savefig(f"outputs/history_{model_name}.png")
+    plt.close()
+    print(f"บันทึกกราฟประวัติการเทรนไว้ที่ 'outputs/history_{model_name}.png'")
 
 def evaluate_model(model, X_test, y_test):
-    os.makedirs("outputs", exist_ok=True)
-    
     y_pred_prob = model.predict(X_test, verbose=0)
     y_pred = (y_pred_prob > 0.5).astype(int).flatten()
-    
-    print(f"\nCNN Accuracy: {accuracy_score(y_test, y_pred):.4f}\n")
-    print("Classification Report:\n", classification_report(y_test, y_pred))
-    
-    plt.figure(figsize=(5, 4))
-    sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d', cmap='Blues')
-    plt.title('Confusion Matrix (1D CNN)')
-    plt.savefig("outputs/cm_cnn.png")
-    plt.close()
+    acc = accuracy_score(y_test, y_pred)
+    return acc
