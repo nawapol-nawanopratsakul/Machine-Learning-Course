@@ -1,36 +1,45 @@
 import os
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score
+import seaborn as sns
+from sklearn.metrics import accuracy_score, confusion_matrix
 
-def plot_training_history(history, model_name):
+def plot_paper_style_history(history_1, history_2, model_names):
     os.makedirs("outputs", exist_ok=True)
-    plt.figure(figsize=(10, 4))
     
-    # กราฟ Accuracy
-    plt.subplot(1, 2, 1)
-    plt.plot(history.history['accuracy'], label='Train Accuracy')
-    plt.plot(history.history['val_accuracy'], label='Val Accuracy')
-    plt.title(f'Accuracy: {model_name}')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.legend()
+    sns.set_style("darkgrid")
+    plt.rcParams['axes.facecolor'] = '#EAEAF2'
     
-    # กราฟ Loss
-    plt.subplot(1, 2, 2)
-    plt.plot(history.history['loss'], label='Train Loss')
-    plt.plot(history.history['val_loss'], label='Val Loss')
-    plt.title(f'Loss: {model_name}')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
+    fig, axs = plt.subplots(3, 2, figsize=(14, 15))
+    epochs = range(1, len(history_1.history['accuracy']) + 1)
     
-    plt.tight_layout()
-    plt.savefig(f"outputs/history_{model_name}.png")
-    plt.close()
-    print(f"บันทึกกราฟประวัติการเทรนไว้ที่ 'outputs/history_{model_name}.png'")
+    def plot_panel(ax, metric, title, y_label):
+        ax.plot(epochs, history_1.history[metric], marker='o', markersize=4, linestyle='--', color='royalblue', label=model_names[0])
+        ax.plot(epochs, history_2.history[metric], marker='s', markersize=4, linestyle='-', color='mediumvioletred', label=model_names[1])
+        ax.set_title(title, fontsize=12, fontweight='bold', pad=10)
+        ax.set_xlabel('Epochs', fontsize=10)
+        ax.set_ylabel(y_label, fontsize=10)
+        ax.legend(loc='lower right' if 'loss' not in metric else 'upper right', fontsize=9)
 
-def evaluate_model(model, X_test, y_test):
+    plot_panel(axs[0, 0], 'accuracy', '(a) Training accuracy of models.', 'Accuracy (%)')
+    plot_panel(axs[0, 1], 'val_accuracy', '(b) Validation accuracy of models.', 'Validation Accuracy (%)')
+    plot_panel(axs[1, 0], 'loss', '(c) Training loss of models.', 'Loss')
+    plot_panel(axs[1, 1], 'val_loss', '(d) Validation loss of model.', 'Loss')
+    plot_panel(axs[2, 0], 'precision', '(e) Precision performance of training model.', 'Precision (%)')
+    plot_panel(axs[2, 1], 'recall', '(f) Recall performance of training model.', 'Recall (%)')
+
+    plt.tight_layout()
+    plt.savefig("outputs/research_paper_graphs.png", dpi=300)
+    plt.close()
+
+def evaluate_model(model, X_test, y_test, model_name):
     y_pred_prob = model.predict(X_test, verbose=0)
     y_pred = (y_pred_prob > 0.5).astype(int).flatten()
-    acc = accuracy_score(y_test, y_pred)
-    return acc
+    
+    # วาดและเซฟรูป Confusion Matrix ของแต่ละโมเดล
+    plt.figure(figsize=(5, 4))
+    sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d', cmap='Blues')
+    plt.title(f'Confusion Matrix ({model_name})')
+    plt.savefig(f"outputs/cm_{model_name}.png")
+    plt.close()
+    
+    return accuracy_score(y_test, y_pred)
