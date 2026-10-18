@@ -1,16 +1,19 @@
-# ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี
-**รหัสวิชา:** 04-624-201 ชื่อวิชา: Machine Learning  
-**ใบงานที่ 10:** Object Detection II (YOLO)
+# LAB 10: Object Detection II (YOLO) - Machine Learning
+
+เอกสารและโค้ดตัวอย่างสำหรับการทดลองในปฏิบัติการรายวิชา Machine Learning เรื่อง การตรวจจับวัตถุด้วยอัลกอริทึม YOLO (You Only Look Once) โดยใช้ไลบรารี Ultralytics YOLOv8
 
 ---
 
 ## 📋 วัตถุประสงค์ (Objectives)
-1. เพื่อให้นักศึกษาเข้าใจหลักการทำงานของ Object Detection โดยใช้ YOLO (You Only Look Once) สำหรับการตรวจจับ จำแนกประเภท และระบุตำแหน่งวัตถุภายในภาพ
-2. เพื่อให้นักศึกษาสามารถพัฒนา ฝึกสอน และประเมินประสิทธิภาพแบบจำลอง YOLO รวมถึงนำไปประยุกต์ใช้ในการตรวจจับวัตถุจากภาพ วิดีโอ และกล้องแบบเรียลไทม์
+
+1. เพื่อให้นักศึกษาเข้าใจหลักการทำงานของ Object Detection (การจำแนกประเภทพร้อมระบุตำแหน่ง bounding box ของวัตถุในภาพ)
+2. เพื่อให้สามารถฝึกสอน (Train), ประเมินประสิทธิภาพ (Evaluate) และปรับแต่งค่าพารามิเตอร์ของโมเดล YOLO ได้
+3. สามารถนำโมเดลไปประยุกต์ใช้ตรวจจับวัตถุจากรูปภาพ, วิดีโอ และกล้องแบบ Real-time
 
 ---
 
 ## 📂 โครงสร้างโปรเจกต์ (Project Structure)
+
 ```text
 LAB10/
 ├── train.py          # สคริปต์สำหรับฝึกสอนโมเดล (Training)
@@ -23,119 +26,60 @@ LAB10/
 ---
 
 ## 🛠️ การติดตั้งและเตรียมความพร้อม (Installation)
-ติดตั้งไลบรารีที่จำเป็นผ่านคำสั่ง pip:
+
+1. ติดตั้งไลบรารีที่จำเป็นผ่านคำสั่ง pip:
+
 ```bash
 pip install ultralytics opencv-python torch torchvision matplotlib pandas
 ```
 
 ---
 
-## 💻 ซอร์สโค้ดสำหรับแต่ละโมดูล (Source Code)
+## 🚀 วิธีการใช้งานสคริปต์ (Usage)
 
-### 1. ไฟล์สำหรับเทรนโมเดล (`train.py`)
-```python
-from pathlib import Path
-from ultralytics import YOLO
+### 1. การฝึกสอนโมเดล (Training)
 
+รันสคริปต์เพื่อเริ่มเทรนโมเดล YOLOv8 (สามารถใช้ชุดข้อมูลมาตรฐาน `coco8.yaml` หรือชุดข้อมูล Custom Dataset ของตัวเอง):
 
-def main():
-  # โหลดพรีไทรนโมเดล YOLOv8 Nano
-  model = YOLO("yolov8n.pt")
-
-  # เริ่มเทรนโมเดลตามโจทย์ Lab (ใช้ coco8.yaml สำหรับทดสอบความสะดวกรวดเร็ว)
-  results = model.train(
-      data="coco8.yaml",
-      epochs=10,
-      imgsz=480,
-      batch=8,
-      device="cpu",  # ใช้ CPU หากเครื่องไม่มีการ์ดจอ NVIDIA ที่รองรับ CUDA
-      workers=0,
-      amp=True,
-      cache=False,
-      project="runs",
-      name="car_detection_lab",
-      exist_ok=True,
-      save=True,
-      plots=True,
-  )
-
-  save_dir = Path(model.trainer.save_dir)
-  print("Training completed!")
-  print(f"Best Model: {save_dir / 'weights/best.pt'}")
-  print(f"Last Model: {save_dir / 'weights/last.pt'}")
-  print(f"Training CSV: {save_dir / 'results.csv'}")
-
-
-if __name__ == "__main__":
-  main()
+```bash
+python train.py
 ```
 
-### 2. ไฟล์สำหรับประเมินผลโมเดล (`evaluate.py`)
-```python
-from ultralytics import YOLO
+**ตัวอย่างการตั้งค่าในโค้ด:**
+- **Model:** `yolov8n.pt` (YOLOv8 Nano)
+- **Epochs:** 10
+- **Image Size:** 480x480
+- **Batch Size:** 8
+- **Device:** CPU / GPU
 
+### 2. การประเมินผลโมเดล (Evaluation)
 
-def evaluate_model():
-  # โหลดโมเดลที่เทรนเสร็จแล้ว
-  model = YOLO("runs/car_detection_lab/weights/best.pt")
+ตรวจสอบค่าความแม่นยำและประสิทธิภาพของโมเดลหลังจากเทรนเสร็จ:
 
-  # ประเมินผลบนชุดทดสอบ (Validation/Test set)
-  metrics = model.val()
-
-  print(f"mAP50-95: {metrics.box.map}")
-  print(f"mAP50: {metrics.box.map50}")
-  print(f"Precision: {metrics.box.p}")
-  print(f"Recall: {metrics.box.r}")
-
-
-if __name__ == "__main__":
-  evaluate_model()
+```bash
+python evaluate.py
 ```
 
-### 3. ไฟล์สำหรับทดสอบกับรูปภาพ (`image_test.py`)
-```python
-from ultralytics import YOLO
+*(แสดงผลค่า Precision, Recall, และ mAP)*
 
+### 3. การทดสอบกับรูปภาพ (Image Detection)
 
-def test_image():
-  model = YOLO("runs/car_detection_lab/weights/best.pt")
+ทดสอบการตรวจจับวัตถุบนภาพถ่าย:
 
-  # ทำนายผลบนภาพตัวอย่าง
-  results = model("test_car.jpg", show=True, conf=0.5)
-  print("Object detection on image completed!")
-
-
-if __name__ == "__main__":
-  test_image()
+```bash
+python image_test.py
 ```
 
-### 4. ไฟล์สำหรับทดสอบแบบ Real-time (`realtime_test.py`)
-```python
-from ultralytics import YOLO
+### 4. การทดสอบแบบ Real-time
 
+เปิดกล้อง Webcam เพื่อทดสอบการตรวจจับวัตถุแบบเรียลไทม์:
 
-def realtime_detection():
-  model = YOLO("runs/car_detection_lab/weights/best.pt")
-
-  # เปิดกล้อง Webcam (0 คือกล้องหลัก)
-  results = model(source=0, show=True, conf=0.4)
-
-
-if __name__ == "__main__":
-  realtime_detection()
-```
-
-### 5. รายชื่อแพ็กเกจ (`requirements.txt`)
-```text
-ultralytics>=8.0.0
-opencv-python
-torch
-torchvision
-matplotlib
-pandas
+```bash
+python realtime_test.py
 ```
 
 ---
 
-## 📊 ผลลัพธ์และชิ้นงานที่คาดหวัง (Output)
-* โฟลเดอร์ `runs/car_detection_lab/` จะเก็บไฟล์น้ำหนักของโมเดล (`weights/best.pt`), กราฟ Loss และผลลัพธ์การประเมินประสิทธิภาพ (Precision, Recall, mAP) พร้อมส่งรายงานตามโจทย์ปฏิบัติการ
+## 📊 ผลลัพธ์และชิ้นงาน (Output)
+
+- โฟลเดอร์ `runs/` จะเก็บไฟล์น้ำหนักของโมเดล (`best.pt`, `last.pt`), กราฟ Loss และผลลัพธ์การประเมินผล (Training CSV / Validation Plots) ตามโจทย์ข้อกำหนดของปฏิบัติการ

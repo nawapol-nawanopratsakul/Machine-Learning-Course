@@ -1,0 +1,330 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบประเมินราคารถยนต์มือสอง | Car Valuation</title>
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius);
+            padding: 36px 32px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header-icon {
+            font-size: 42px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .header h2 {
+            color: var(--text-main);
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text-main);
+            background-color: #f8fafc;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #result {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .result-success {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .result-success strong {
+            font-size: 26px;
+            color: #047857;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .result-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .result-loading {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+        }
+
+        @media (max-width: 580px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .btn-submit {
+                grid-column: span 1;
+            }
+            .card {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <span class="header-icon">🚘</span>
+                <h2>ประเมินราคารถยนต์มือสอง</h2>
+                <p>คำนวณราคาประเมินแม่นยำด้วยโมเดล Deep Learning (1D CNN)</p>
+            </div>
+
+            <form id="carForm" class="form-grid">
+                <!-- ชื่อรุ่นรถเต็ม -->
+                <div class="form-group full-width">
+                    <label for="name">🚘 ชื่อยี่ห้อและรุ่นรถยนต์เต็ม:</label>
+                    <input type="text" id="name" required placeholder="เช่น Honda City 1.5 V, Toyota Vios E" value="Honda City 1.5 V">
+                </div>
+
+                <!-- ปีที่ผลิต -->
+                <div class="form-group">
+                    <label for="year">📅 ปีที่ผลิต (Year):</label>
+                    <input type="number" id="year" required value="2018" min="1990" max="2026">
+                </div>
+
+                <!-- ระยะทางที่วิ่ง -->
+                <div class="form-group">
+                    <label for="km_driven">🛣️ เลขไมล์ (กิโลเมตร):</label>
+                    <input type="number" id="km_driven" required value="65000" placeholder="เช่น 65000">
+                </div>
+
+                <!-- ประเภทเชื้อเพลิง -->
+                <div class="form-group">
+                    <label for="fuel">⛽ เชื้อเพลิง (Fuel):</label>
+                    <select id="fuel">
+                        <option value="Petrol" selected>Petrol (เบนซิน)</option>
+                        <option value="Diesel">Diesel (ดีเซล)</option>
+                        <option value="CNG">CNG / LPG</option>
+                    </select>
+                </div>
+
+                <!-- ประเภทผู้ขาย -->
+                <div class="form-group">
+                    <label for="seller_type">👤 ผู้ขาย (Seller Type):</label>
+                    <select id="seller_type">
+                        <option value="Individual" selected>เจ้าของขายเอง (Individual)</option>
+                        <option value="Dealer">เต็นท์รถ/ตัวแทน (Dealer)</option>
+                        <option value="Trustmark Dealer">ศูนย์รับรองคุณภาพ (Trustmark Dealer)</option>
+                    </select>
+                </div>
+
+                <!-- ระบบเกียร์ -->
+                <div class="form-group">
+                    <label for="transmission">⚙️ ระบบเกียร์ (Transmission):</label>
+                    <select id="transmission">
+                        <option value="Automatic" selected>Automatic (อัตโนมัติ)</option>
+                        <option value="Manual">Manual (ธรรมดา)</option>
+                    </select>
+                </div>
+
+                <!-- ลำดับเจ้าของ -->
+                <div class="form-group">
+                    <label for="owner">🔑 ลำดับเจ้าของ (Owner):</label>
+                    <select id="owner">
+                        <option value="First Owner" selected>มือเดียว (First Owner)</option>
+                        <option value="Second Owner">มือสอง (Second Owner)</option>
+                        <option value="Third Owner">มือสาม (Third Owner)</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    <span>✨ ประเมินราคาตอนนี้</span>
+                </button>
+            </form>
+
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('carForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('result');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result-loading';
+            resultDiv.innerHTML = '⏳ กำลังประมวลผลการคำนวณผ่านโมเดล 1D CNN...';
+            submitBtn.disabled = true;
+
+            const yearVal = parseInt(document.getElementById('year').value);
+            const carAgeVal = 2026 - yearVal;
+
+            const payload = {
+                name: document.getElementById('name').value,
+                year: yearVal,
+                car_age: carAgeVal >= 0 ? carAgeVal : 0,
+                km_driven: parseInt(document.getElementById('km_driven').value),
+                fuel: document.getElementById('fuel').value,
+                seller_type: document.getElementById('seller_type').value,
+                transmission: document.getElementById('transmission').value,
+                owner: document.getElementById('owner').value
+            };
+
+            try {
+                const res = await fetch('http://localhost:3000/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    resultDiv.className = 'result-success';
+                    resultDiv.innerHTML = `
+                        💰 ราคาประเมินประมาณ
+                        <strong>${Number(data.predicted_price).toLocaleString('th-TH', { maximumFractionDigits: 0 })} บาท</strong>
+                    `;
+                } else {
+                    resultDiv.className = 'result-error';
+                    resultDiv.innerHTML = `❌ เกิดข้อผิดพลาด: ${data.error || 'ไม่สามารถประเมินราคาได้'}`;
+                }
+            } catch (err) {
+                resultDiv.className = 'result-error';
+                resultDiv.innerHTML = `❌ เชื่อมต่อ Server ไม่สำเร็จ: ${err.message}`;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
